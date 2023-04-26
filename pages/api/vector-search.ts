@@ -44,7 +44,7 @@ export default async function handler(req: NextRequest) {
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
-    const moderationResponse = await fetch('https://api.openai.com/v1/moderations', {
+    const moderationResponse = await fetch(process.env.OPENAI_BASE_API+'/moderations', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${openAiKey}`,
@@ -64,7 +64,7 @@ export default async function handler(req: NextRequest) {
       })
     }
 
-    const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
+    const embeddingResponse = await fetch(process.env.OPENAI_BASE_API+'/embeddings', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${openAiKey}`,
@@ -108,7 +108,7 @@ export default async function handler(req: NextRequest) {
       const encoded = tokenizer.encode(content)
       tokenCount += encoded.text.length
 
-      if (tokenCount >= 1500) {
+      if (tokenCount >= 2500) {
         break
       }
 
@@ -122,7 +122,7 @@ export default async function handler(req: NextRequest) {
        Please only provide advice related to this situation. Based on the specific sections from the documentation, 
        answer the question only using that information. Please be aware that if there are any updates to the legal provisions, 
        please reference the most current content. Your output must be in Chinese. If you are uncertain or the answer is not 
-       explicitly written in the documentation, please respond with "I'm sorry, I cannot assist with this."
+       explicitly written in the documentation, please respond with "很抱歉，我无法解释这个咨询."
       `}
 
       Context sections:
@@ -133,17 +133,17 @@ export default async function handler(req: NextRequest) {
       """
 
       Answer:
-    `
+    ` 
 
     const completionOptions: CreateChatCompletionRequest = {
       model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 256,
-      temperature: 0,
+      max_tokens: 500,
+      temperature: 1,
       stream: true,
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(process.env.OPENAI_BASE_API+'/chat/completions', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${openAiKey}`,

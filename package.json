@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "pnpm run embeddings && next build",
-    "start": "next start",
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
     "lint": "next lint",
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css,md,json}\"",
-    "embeddings": "tsx lib/generate-embeddings.ts"
+    "embeddings": "tsx lib/generate-embeddings.ts",
+    "files": "tsx lib/files.ts"
   },
   "prettier": {
     "trailingComma": "es5",
@@ -32,8 +33,10 @@
     "common-tags": "^1.8.2",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "eventsource-parser": "^1.0.0",
     "github-slugger": "^2.0.0",
     "gpt3-tokenizer": "^1.1.5",
+    "https-proxy-agent": "^5.0.1",
     "lucide-react": "^0.128.0",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.2.0",
@@ -42,6 +45,7 @@
     "mdast-util-to-string": "^3.1.1",
     "micromark-extension-mdxjs": "^1.0.0",
     "next": "13.2.4",
+    "node-fetch": "^3.3.1",
     "openai": "^3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -57,9 +61,11 @@
     "@types/estree": "^1.0.0",
     "@types/mdast": "^3.0.11",
     "autoprefixer": "^10.4.14",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "postcss": "^8.4.21",
     "prettier": "^2.8.7",
+    "supabase": "^1.50.11",
     "tailwindcss": "^3.2.7",
     "tsx": "^3.12.6"
   }

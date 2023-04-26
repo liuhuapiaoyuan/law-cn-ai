@@ -16,7 +16,11 @@ import { basename, dirname, join } from 'path'
 import { u } from 'unist-builder'
 import { filter } from 'unist-util-filter'
 import { inspect } from 'util'
+import fetch from 'node-fetch'
+import HttpsProxyAgent  from 'https-proxy-agent'
 
+const proxy = 'http://127.0.0.1:7890'; // 代理地址
+const agent =  HttpsProxyAgent(proxy); // 创建代理 Agent 实例
 dotenv.config()
 
 const ignoredFiles = ['pages/404.mdx']
@@ -280,15 +284,18 @@ async function generateEmbeddings() {
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.SUPABASE_SERVICE_ROLE_KEY, 
     {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
+      global:{
+        /* @ts-ignore */
+        fetch(input, init) {
+            return fetch(input as any,{...init,agent} as any)
+        },
+      }
     }
-  )
-
+     
+  ) 
+  
   const embeddingSources: EmbeddingSource[] = [
     ...(await walk('pages'))
       .filter(({ path }) => /\.mdx?$/.test(path))
@@ -296,7 +303,7 @@ async function generateEmbeddings() {
       .map((entry) => new MarkdownEmbeddingSource('guide', entry.path)),
   ]
 
-  console.log(`Discovered ${embeddingSources.length} pages`)
+  console.log(`发现 ${embeddingSources.length} pages`)
 
   if (!shouldRefresh) {
     console.log('Checking which pages are new or have changed')
@@ -319,6 +326,7 @@ async function generateEmbeddings() {
         .maybeSingle()
 
       if (fetchPageError) {
+        console.log("数据库抓取失败" ,fetchPageError)
         throw fetchPageError
       }
 
@@ -416,7 +424,8 @@ async function generateEmbeddings() {
 
         try {
           const configuration = new Configuration({
-            apiKey: process.env.OPENAI_KEY,
+            apiKey: process.env.OPENAI_KEY , 
+            basePath:process.env.OPENAI_BASE_API , 
           })
           const openai = new OpenAIApi(configuration)
 
